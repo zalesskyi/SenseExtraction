@@ -1,5 +1,6 @@
 package com.zalesskyi.android.diploma.app.di;
 
+import com.zalesskyi.android.diploma.view.detail_operation.activities.DetailActivity;
 import com.zalesskyi.android.diploma.view.main_operation.activities.MainActivity;
 
 import javax.inject.Inject;
@@ -10,4 +11,6 @@ import dagger.Component;
 public interface AppComponent {
 
     void inject(MainActivity activity);
+
+    void inject(DetailActivity activity);
 }

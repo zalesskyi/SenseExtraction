@@ -2,6 +2,8 @@ package com.zalesskyi.android.diploma.app.di;
 
 import android.app.Application;
 
+import com.zalesskyi.android.diploma.realm.RealmService;
+import com.zalesskyi.android.diploma.realm.RealmServiceImpl;
 import com.zalesskyi.android.diploma.utils.NetworkCheck;
 
 import dagger.Module;
@@ -29,5 +31,10 @@ public class AppModule {
     @Provides
     public Realm provideRealm() {
         return Realm.getDefaultInstance();
+    }
+
+    @Provides
+    public RealmService provideRealmService(Realm realm) {
+        return new RealmServiceImpl(realm);
     }
 }

@@ -1,5 +1,9 @@
 package com.zalesskyi.android.diploma.interactor;
 
+import com.google.gson.JsonObject;
+
+import rx.Observable;
+
 public interface InteractorContract {
 
     /**
@@ -9,5 +13,5 @@ public interface InteractorContract {
      * @param coefficient коэффициент реферирования.
      * @return поток данных с сервера (реферат)
      */
-    void toDoGetAbstract(String source, Integer coefficient);
+    Observable<JsonObject> toDoGetAbstract(String source, Integer coefficient);
 }

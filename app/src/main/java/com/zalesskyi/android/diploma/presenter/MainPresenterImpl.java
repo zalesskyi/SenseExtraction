@@ -3,32 +3,19 @@ package com.zalesskyi.android.diploma.presenter;
 import android.app.Application;
 
 import com.zalesskyi.android.diploma.interactor.Interactor;
+import com.zalesskyi.android.diploma.realm.RealmService;
 import com.zalesskyi.android.diploma.utils.NetworkCheck;
-
-import java.io.File;
 
 public class MainPresenterImpl extends BasePresenter
         implements PresenterContract.MainPresenter {
+    private static final String TAG = "MainPresenter";
 
-    public MainPresenterImpl(Application application, NetworkCheck networkCheck, Interactor interactor) {
+    public MainPresenterImpl(Application application, NetworkCheck networkCheck
+            , Interactor interactor, RealmService realmService) {
         super.mApplication = application;
         super.mNetworkCheck = networkCheck;
         super.mInteractor = interactor;
-    }
-
-    @Override
-    public void doGetAbstractFromFile(File sourceText) {
-
-    }
-
-    @Override
-    public void doGetAbstractFromString(String sourceText) {
-        mInteractor.toDoGetAbstract(sourceText, 0);
-    }
-
-    @Override
-    public void doGetAbstractFromUrl(String sourceTextUrl) {
-
+        super.mRealmService = realmService;
     }
 
     @Override

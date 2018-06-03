@@ -9,6 +9,9 @@ import com.zalesskyi.android.diploma.app.di.AppModule;
 import com.zalesskyi.android.diploma.app.di.DaggerAppComponent;
 import com.zalesskyi.android.diploma.app.di.PresenterModule;
 
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
+
 public class App extends Application {
 
     private AppComponent mAppComponent;
@@ -25,6 +28,7 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         initAppComponent();
+        initRealmConfiguration();
     }
 
     private void initAppComponent() {
@@ -33,5 +37,14 @@ public class App extends Application {
                 .apiModule(new ApiModule())
                 .presenterModule(new PresenterModule())
                 .build();
+    }
+
+    private void initRealmConfiguration() {
+        Realm.init(this);
+        RealmConfiguration realmConfig = new RealmConfiguration.Builder()
+                .name("sense.realm")
+                .schemaVersion(1)
+                .build();
+        Realm.setDefaultConfiguration(realmConfig);
     }
 }

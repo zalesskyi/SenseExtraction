@@ -3,14 +3,16 @@ package com.zalesskyi.android.diploma.interactor;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.zalesskyi.android.diploma.Api;
-import com.zalesskyi.android.diploma.app.model.Request;
+import com.zalesskyi.android.diploma.model.Request;
 
 import java.io.IOException;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
-import rx.Scheduler;
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
 public class Interactor
@@ -23,18 +25,21 @@ public class Interactor
     }
 
     @Override
-    public void toDoGetAbstract(String source, Integer coefficient) {
+    public Observable<JsonObject> toDoGetAbstract(String source, Integer coefficient) {
         MediaType mediaType = MediaType.parse("application/json");
         Request request = new Request(source, coefficient);
         String json = toJson(request);
         RequestBody body = RequestBody.create(mediaType, json);
-            mApi.getAbstract(body)
+            return mApi.getAbstract(body)
                     .subscribeOn(Schedulers.io())
-                    .subscribe(next -> {
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .map(response -> {
                         try {
-                            Log.i(TAG, next.string());
+                            return new Gson().fromJson(response.string(), JsonObject.class);
                         } catch (IOException exc) {
                             exc.printStackTrace();
-                        }}, err -> Log.e(TAG, err.getMessage()));
+                            return null;
+                        }
+                    });
     }
 }

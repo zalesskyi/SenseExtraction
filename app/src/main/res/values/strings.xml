@@ -3,4 +3,13 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="empty_list_text">There are no abstracts yet</string>
+    <string name="bs_web_page">Web-page</string>
+    <string name="bs_txt_file">Txt-file</string>
+    <string name="bs_pdf_file">Pdf-file</string>
+    <string name="bs_doc">Doc/Docx</string>
+    <string name="bs_drive">Google Drive</string>
+    <string name="bs_title">New abstract of</string>
+    <string name="bs_clipboard">Clipboard</string>
 </resources>

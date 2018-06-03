@@ -1,37 +1,9 @@
 package com.zalesskyi.android.diploma.presenter;
 
-import java.io.File;
 
 public interface PresenterContract {
 
     interface MainPresenter {
-
-        /**
-         * Получение реферата текста, который содержится в файле.
-         * Файл может быть 3 видов:
-         *  1) PDF
-         *  2) DOC/DOCX
-         *  3) TXT
-         *
-         * Текст извлекается из файла и отправляется на сервер.
-         *
-         * @param sourceText файл с исходным текстом
-         */
-        void doGetAbstractFromFile(File sourceText);
-
-        /**
-         * Получение реферата текста.
-         *
-         * @param sourceText исходный текст
-         */
-        void doGetAbstractFromString(String sourceText);
-
-        /**
-         * Получение реферата текста исходя из его url.
-         *
-         * @param sourceTextUrl url на web-страницу с исходным текстом
-         */
-        void doGetAbstractFromUrl(String sourceTextUrl);
 
         /**
          * Поделиться результатом реферирования.
@@ -61,5 +33,46 @@ public interface PresenterContract {
          * @param id id реферата.
          */
         void removeAbstract(long id);
+    }
+
+
+    //----------------------------------------------------------------------------------------------
+    interface DetailPresenter {
+        /**
+         * Получение реферата txt-файла.
+         * @param pathToSourceTxt путь к txt-файлу.
+         */
+        void doGetAbstractFromTxt(String pathToSourceTxt);
+
+        /**
+         * Получение реферата pdf-файла.
+         * @param pathToSourcePdf путь к pdf-файлу.
+         */
+        void doGetAbstractFromPdf(String pathToSourcePdf);
+
+        /**
+         * Получение реферата doc(x)-файла.
+         * @param pathToSourceDoc путь к doc(x)-файлу.
+         */
+        void doGetAbstractFromDoc(String pathToSourceDoc);
+
+        /**
+         * Получение реферата текста.
+         *
+         * @param sourceText исходный текст
+         */
+        void doGetAbstractFromString(String sourceText);
+
+        /**
+         * Получение реферата текста исходя из его url.
+         *
+         * @param sourceTextUrl url на web-страницу с исходным текстом
+         */
+        void doGetAbstractFromUrl(String sourceTextUrl);
+
+        /**
+         * Получение реферата текста из буфера обмена.
+         */
+        void doGetAbstractFromClipboard();
     }
 }
