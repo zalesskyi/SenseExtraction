@@ -15,7 +15,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/bottom_sheet_title"
-        android:paddingBottom="20dp"
+        android:paddingBottom="30dp"
         style="@android:style/TextAppearance.DialogWindowTitle"
         android:textColor="@color/bottom_sheet_title"
         android:text="@string/bs_title"

@@ -6,10 +6,10 @@ import io.realm.annotations.PrimaryKey;
 public class Abstract extends RealmObject {
     @PrimaryKey
     private long mId;
-    private String mPathToSource;     // или URL
-    private String mPathToAbstract;   // для web-страницы - ссылка на txt-файл с рефератом
-    private String mPathToSourceThumb;
+    private String mPathToSource;       // или URL
+    private String mPathToAbstract;     // для web-страницы - ссылка на txt-файл с рефератом
     private String mPathToAbstractThumb;
+    private String mPathToImagesIfDoc;  // путь к директории с изображениями страниц
     private String mIsFavorite;
     private long mCreationDate;
     private int mType;
@@ -33,11 +33,11 @@ public class Abstract extends RealmObject {
         mPathToSource = builder.mPathToSource;
         mPathToAbstract = builder.mPathToAbstract;
         mPathToAbstractThumb = builder.mPathToAbstractThumb;
-        mPathToSourceThumb = builder.mPathToSourceThumb;
         mIsFavorite = builder.mIsFavorite;
         mCreationDate = builder.mCreationDate;
         mType = builder.mType;
         mIsSyncedWithCloud = builder.mIsSyncedWithCloud;
+        mPathToImagesIfDoc = builder.mPathToImagesIfDoc;
     }
 
     public long getId() {
@@ -50,10 +50,6 @@ public class Abstract extends RealmObject {
 
     public String getPathToAbstract() {
         return mPathToAbstract;
-    }
-
-    public String getPathToSourceThumb() {
-        return mPathToSourceThumb;
     }
 
     public String getPathToAbstractThumb() {
@@ -76,11 +72,15 @@ public class Abstract extends RealmObject {
         return mIsSyncedWithCloud;
     }
 
+    public String getPathToImagesIfDoc() {
+        return mPathToImagesIfDoc;
+    }
+
     private static class Builder {
         private long mId;
         private String mPathToSource;
         private String mPathToAbstract;
-        private String mPathToSourceThumb;
+        private String mPathToImagesIfDoc;
         private String mPathToAbstractThumb;
         private String mIsFavorite;
         private long mCreationDate;
@@ -97,10 +97,6 @@ public class Abstract extends RealmObject {
 
         public void setPathToAbstract(String pathToAbstract) {
             mPathToAbstract = pathToAbstract;
-        }
-
-        public void setPathToSourceThumb(String pathToSourceThumb) {
-            mPathToSourceThumb = pathToSourceThumb;
         }
 
         public void setPathToAbstractThumb(String pathToAbstractThumb) {
@@ -125,6 +121,10 @@ public class Abstract extends RealmObject {
 
         public Abstract build() {
             return new Abstract(this);
+        }
+
+        public void setPathToImagesIfDoc(String pathToImagesIfDoc) {
+            mPathToImagesIfDoc = pathToImagesIfDoc;
         }
     }
 }

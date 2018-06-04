@@ -16,13 +16,13 @@ import dagger.Provides;
 public class PresenterModule {
 
     @Provides
-    PresenterContract.MainPresenter provideMainPresenter(Application application, NetworkCheck networkCheck,
+    MainPresenterImpl provideMainPresenter(Application application, NetworkCheck networkCheck,
                                                          Interactor interactor, RealmService realmService) {
         return new MainPresenterImpl(application, networkCheck, interactor, realmService);
     }
 
     @Provides
-    PresenterContract.DetailPresenter provideDetailPresenter(Application application, NetworkCheck networkCheck,
+    DetailPresenterImpl provideDetailPresenter(Application application, NetworkCheck networkCheck,
                                                              Interactor interactor, RealmService realmService) {
         return new DetailPresenterImpl(application, networkCheck, interactor, realmService);
     }

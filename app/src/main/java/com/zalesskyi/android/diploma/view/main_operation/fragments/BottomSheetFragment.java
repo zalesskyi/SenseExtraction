@@ -46,11 +46,13 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
             mListener.getPdfFile()
                     .subscribe(path -> {
                         Log.i(TAG, path);
+                        mListener.openPdfFile(path);
                     });
         } else if (v.equals(mDocView)) {
             mListener.getDocFile()
                     .subscribe(path -> {
                         Log.i(TAG, path);
+                        mListener.openDocFile(path);
                     });
         } else if (v.equals(mDriveView)) {
             // todo drive

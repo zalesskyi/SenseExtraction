@@ -1,9 +1,14 @@
 package com.zalesskyi.android.diploma.presenter;
 
 import android.app.Application;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.aspose.words.Document;
+import com.aspose.words.ImageSaveOptions;
+import com.aspose.words.SaveFormat;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 import com.zalesskyi.android.diploma.interactor.Interactor;
@@ -15,6 +20,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Scanner;
@@ -134,6 +140,27 @@ public class DetailPresenterImpl extends BasePresenter
 
     }
 
+    @Override
+    public Observable<Bitmap> doGetDocPageImage(String path, int pageNum) {
+        try {
+            return Observable.just(getDocPageImage(path, pageNum))
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread());
+        } catch (Exception exc) {
+            return Observable.error(exc);
+        }
+    }
+
+    @Override
+    public int doGetWordDocumentPageCount(String pathToDoc) {
+        try {
+            return new Document(pathToDoc).getPageCount();
+        } catch (Exception exc) {
+            mView.showError(exc.getMessage());
+        }
+        return 0;
+    }
+
     /**
      * Извлечение текста из PDF-документа.
      *
@@ -187,5 +214,32 @@ public class DetailPresenterImpl extends BasePresenter
         }
         Log.i(TAG, "text: " + source);
         return source.toString();
+    }
+
+    /**
+     * Обертывается в Observable в методе doGetDocPageImage().
+     *
+     * Если файл с изображением страницы уже существует, то возвращается его bitmap.
+     * Если не существует, то он создается, а затем возвращается его bitmap.
+     *
+     * @param pathToDoc путь к doc-файлу.
+     * @param page номер страницы.
+     * @return картинку страницы doc-файла.
+     */
+    private Bitmap getDocPageImage(String pathToDoc, int page) throws Exception {
+        Document doc = new Document(pathToDoc);
+        BitmapFactory.Options opts = new BitmapFactory.Options();
+        opts.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        String pathToPic = getPathToDocPageImages() + doc.getOriginalFileName() + "/" + page;
+        File file = new File(pathToPic);
+        if (file.exists()) {
+            return BitmapFactory.decodeFile(pathToPic, opts);
+        }
+        ImageSaveOptions options = new ImageSaveOptions(SaveFormat.JPEG);
+        options.setJpegQuality(100);
+        options.setPageIndex(page);
+        options.setPageCount(1);
+        doc.save(pathToPic, options);
+        return BitmapFactory.decodeFile(pathToPic, opts);
     }
 }

@@ -1,6 +1,12 @@
 package com.zalesskyi.android.diploma.presenter;
 
 
+import android.graphics.Bitmap;
+
+import com.aspose.words.Document;
+
+import rx.Observable;
+
 public interface PresenterContract {
 
     interface MainPresenter {
@@ -74,5 +80,15 @@ public interface PresenterContract {
          * Получение реферата текста из буфера обмена.
          */
         void doGetAbstractFromClipboard();
+
+        /**
+         * @param path путь к doc-файлу.
+         * @param pageNum номер страницы, которую надо отобразить.
+         *
+         * @return картинку страницы doc-файла.
+         */
+        Observable<Bitmap> doGetDocPageImage(String path, int pageNum);
+
+        int doGetWordDocumentPageCount(String pathToDoc);
     }
 }

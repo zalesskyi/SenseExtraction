@@ -1,5 +1,6 @@
 package com.zalesskyi.android.diploma.view.main_operation.activities;
 
+import android.Manifest;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -10,6 +11,7 @@ import android.view.View;
 
 import com.zalesskyi.android.diploma.R;
 import com.zalesskyi.android.diploma.app.App;
+import com.zalesskyi.android.diploma.presenter.MainPresenterImpl;
 import com.zalesskyi.android.diploma.presenter.PresenterContract;
 import com.zalesskyi.android.diploma.view.BaseActivity;
 import com.zalesskyi.android.diploma.view.BaseView;
@@ -30,7 +32,6 @@ import rx.Observable;
 public class MainActivity extends BaseActivity
         implements BaseView.MainView {
 
-    private FragmentManager mFragmentManager;
     private BottomSheetFragment mBottomSheet;
 
     @BindView(R.id.toolbar)
@@ -92,7 +93,7 @@ public class MainActivity extends BaseActivity
     };
 
     @Inject
-    PresenterContract.MainPresenter mPresenter;
+    MainPresenterImpl mPresenter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -101,16 +102,9 @@ public class MainActivity extends BaseActivity
 
         App.get(this).getAppComponent().inject(this);
         ButterKnife.bind(this);
+        mPresenter.init(this);
 
-        mFragmentManager = getSupportFragmentManager();
-        Fragment fragment = mFragmentManager.findFragmentById(R.id.main_container);
-
-        if (fragment == null) {
-            fragment = new ListFragment(mListener);
-            mFragmentManager.beginTransaction()
-                    .add(R.id.main_container, fragment)
-                    .commit();
-        }
+        addFragment(R.id.main_container, new ListFragment(mListener));
         setupUI();
     }
 
@@ -134,8 +128,11 @@ public class MainActivity extends BaseActivity
         mToolbar.setTitleTextColor(Color.DKGRAY);
 
         mFab.setOnClickListener(v -> {
-            mBottomSheet = new BottomSheetFragment(mListener);
-            mBottomSheet.show(mFragmentManager, mBottomSheet.getTag());
+            requestPermissions(() -> {
+                mBottomSheet = new BottomSheetFragment(mListener);
+                mBottomSheet.show(mFragmentManager, mBottomSheet.getTag());
+            }, () -> showError("This permission is needed"), Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
         });
     }
 
@@ -143,15 +140,15 @@ public class MainActivity extends BaseActivity
      * Выбор файла из файловой системы устройства.
      *
      * @param formats расширение(я) файла(ов)
-     * @return observable which emmit path
+     * @return observable which emits path
      */
     private Observable<String> chooseFile(String... formats) {
         return Observable.create(subscriber -> {
             try {
                 FileChooser chooserFragment = new FileChooser.Builder(FileChooser.ChooserType.FILE_CHOOSER, path -> {
+                    replaceFragment(R.id.main_container, new ListFragment(mListener));
                     subscriber.onNext(path);
                     subscriber.onCompleted();
-                    replaceWithAnimFragment(R.id.main_container, ListFragment.newInstance());
                     mFab.setVisibility(View.VISIBLE);
                 }).setFileFormats(formats).build();
                 replaceWithAnimFragment(R.id.main_container, chooserFragment);
