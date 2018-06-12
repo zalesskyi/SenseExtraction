@@ -1,19 +1,21 @@
 package com.zalesskyi.android.diploma.realm;
 
+import java.util.UUID;
+
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
 public class Abstract extends RealmObject {
     @PrimaryKey
-    private long mId;
-    private String mPathToSource;       // или URL
-    private String mPathToAbstract;     // для web-страницы - ссылка на txt-файл с рефератом
-    private String mPathToAbstractThumb;
-    private String mPathToImagesIfDoc;  // путь к директории с изображениями страниц
-    private String mIsFavorite;
-    private long mCreationDate;
-    private int mType;
-    private boolean mIsSyncedWithCloud;
+    private String id;
+    private String pathToSource;       // или URL
+    private String pathToAbstract;     // для web-страницы, буфера обмена - ссылка на txt-файл с рефератом
+    private String pathToAbstractThumb;
+    private String pathToImagesIfDoc;  // путь к директории с изображениями страниц
+    private String isFavorite;
+    private long creationDate;
+    private int type;
+    private boolean isSyncedWithCloud;
 
     private static Builder sBuilder;
 
@@ -29,55 +31,55 @@ public class Abstract extends RealmObject {
     }
 
     public Abstract(Builder builder) {
-        mId = builder.mId;
-        mPathToSource = builder.mPathToSource;
-        mPathToAbstract = builder.mPathToAbstract;
-        mPathToAbstractThumb = builder.mPathToAbstractThumb;
-        mIsFavorite = builder.mIsFavorite;
-        mCreationDate = builder.mCreationDate;
-        mType = builder.mType;
-        mIsSyncedWithCloud = builder.mIsSyncedWithCloud;
-        mPathToImagesIfDoc = builder.mPathToImagesIfDoc;
+        id = builder.mId;
+        pathToSource = builder.mPathToSource;
+        pathToAbstract = builder.mPathToAbstract;
+        pathToAbstractThumb = builder.mPathToAbstractThumb;
+        isFavorite = builder.mIsFavorite;
+        creationDate = builder.mCreationDate;
+        type = builder.mType;
+        isSyncedWithCloud = builder.mIsSyncedWithCloud;
+        pathToImagesIfDoc = builder.mPathToImagesIfDoc;
     }
 
-    public long getId() {
-        return mId;
+    public String getId() {
+        return id;
     }
 
     public String getPathToSource() {
-        return mPathToSource;
+        return pathToSource;
     }
 
     public String getPathToAbstract() {
-        return mPathToAbstract;
+        return pathToAbstract;
     }
 
     public String getPathToAbstractThumb() {
-        return mPathToAbstractThumb;
+        return pathToAbstractThumb;
     }
 
     public String getIsFavorite() {
-        return mIsFavorite;
+        return isFavorite;
     }
 
     public long getCreationDate() {
-        return mCreationDate;
+        return creationDate;
     }
 
     public int getType() {
-        return mType;
+        return type;
     }
 
     public boolean isSyncedWithCloud() {
-        return mIsSyncedWithCloud;
+        return isSyncedWithCloud;
     }
 
     public String getPathToImagesIfDoc() {
-        return mPathToImagesIfDoc;
+        return pathToImagesIfDoc;
     }
 
     private static class Builder {
-        private long mId;
+        private String mId = UUID.randomUUID().toString();
         private String mPathToSource;
         private String mPathToAbstract;
         private String mPathToImagesIfDoc;
@@ -86,10 +88,6 @@ public class Abstract extends RealmObject {
         private long mCreationDate;
         private int mType;
         private boolean mIsSyncedWithCloud;
-
-        public void setId(long id) {
-            mId = id;
-        }
 
         public void setPathToSource(String pathToSource) {
             mPathToSource = pathToSource;

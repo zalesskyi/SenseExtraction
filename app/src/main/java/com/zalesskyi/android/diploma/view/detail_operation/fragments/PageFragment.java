@@ -16,20 +16,31 @@ import butterknife.ButterKnife;
 
 public class PageFragment extends Fragment {
 
+    private static final String PAGE_ARG_KEY = "page_arg";
+
     private DetailListener mListener;
     private int mCurrentPage;
 
     @BindView(R.id.page_image_view)
     ImageView mPageImage;
 
+    public static PageFragment newInstance(DetailListener listener, int page) {
+        PageFragment fragment = new PageFragment();
+        fragment.setListener(listener);
+        Bundle args = new Bundle();
+        args.putInt(PAGE_ARG_KEY, page);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     public PageFragment() {
         // required
     }
 
-    @SuppressLint("ValidFragment")
-    public PageFragment(DetailListener listener, int page) {
-        mListener = listener;
-        mCurrentPage = page;
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mCurrentPage = getArguments().getInt(PAGE_ARG_KEY, 1);
     }
 
     @Override
@@ -39,5 +50,9 @@ public class PageFragment extends Fragment {
 
         mListener.displayDocPage(mPageImage);
         return v;
+    }
+
+    public void setListener(DetailListener listener) {
+        mListener = listener;
     }
 }

@@ -3,6 +3,8 @@ package com.zalesskyi.android.diploma.view.main_operation.activities;
 import android.Manifest;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.IdRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -16,7 +18,9 @@ import com.zalesskyi.android.diploma.presenter.PresenterContract;
 import com.zalesskyi.android.diploma.view.BaseActivity;
 import com.zalesskyi.android.diploma.view.BaseView;
 import com.zalesskyi.android.diploma.view.detail_operation.activities.DetailActivity;
+import com.zalesskyi.android.diploma.view.detail_operation.listeners.DetailListener;
 import com.zalesskyi.android.diploma.view.main_operation.fragments.BottomSheetFragment;
+import com.zalesskyi.android.diploma.view.main_operation.fragments.LinkDialogFragment;
 import com.zalesskyi.android.diploma.view.main_operation.fragments.ListFragment;
 import com.zalesskyi.android.diploma.view.main_operation.listeners.MainListener;
 
@@ -49,7 +53,7 @@ public class MainActivity extends BaseActivity
 
         @Override
         public Observable<String> getLink() {
-            return null;
+            return enterLink();
         }
 
         @Override
@@ -68,27 +72,33 @@ public class MainActivity extends BaseActivity
         }
 
         @Override
-        public void openTxtFile(String path) {
+        public void openTxtFile(String path, boolean isForUploading) {
             startActivity(DetailActivity.newIntent(
-                    MainActivity.this, DetailActivity.DETAIL_TYPE_TXT_FILE, path));
+                    MainActivity.this, DetailActivity.DETAIL_TYPE_TXT_FILE, path, isForUploading));
         }
 
         @Override
-        public void openPdfFile(String path) {
+        public void openPdfFile(String path, boolean isForUploading) {
             startActivity(DetailActivity.newIntent(
-                    MainActivity.this, DetailActivity.DETAIL_TYPE_PDF_FILE, path));
+                    MainActivity.this, DetailActivity.DETAIL_TYPE_PDF_FILE, path, isForUploading));
         }
 
         @Override
-        public void openDocFile(String path) {
+        public void openDocFile(String path, boolean isForUploading) {
             startActivity(DetailActivity.newIntent(
-                    MainActivity.this, DetailActivity.DETAIL_TYPE_DOC_FILE, path));
+                    MainActivity.this, DetailActivity.DETAIL_TYPE_DOC_FILE, path, isForUploading));
         }
 
         @Override
-        public void openWebPage(String url) {
+        public void openWebPage(String url, boolean isForUploading) {
             startActivity(DetailActivity.newIntent(
-                    MainActivity.this, DetailActivity.DETAIL_TYPE_WEB_PAGE, url));
+                    MainActivity.this, DetailActivity.DETAIL_TYPE_WEB_PAGE, url, isForUploading));
+        }
+
+        @Override
+        public void openClipboardText(boolean isForUploading) {
+            startActivity(DetailActivity.newIntent(MainActivity.this,
+                    DetailActivity.DETAIL_TYPE_CLIPBOARD_TEXT, null, isForUploading));
         }
     };
 
@@ -104,7 +114,7 @@ public class MainActivity extends BaseActivity
         ButterKnife.bind(this);
         mPresenter.init(this);
 
-        addFragment(R.id.main_container, new ListFragment(mListener));
+        addFragment(R.id.main_container, ListFragment.newInstance(mListener));
         setupUI();
     }
 
@@ -129,7 +139,7 @@ public class MainActivity extends BaseActivity
 
         mFab.setOnClickListener(v -> {
             requestPermissions(() -> {
-                mBottomSheet = new BottomSheetFragment(mListener);
+                mBottomSheet = BottomSheetFragment.newInstance(mListener);
                 mBottomSheet.show(mFragmentManager, mBottomSheet.getTag());
             }, () -> showError("This permission is needed"), Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
@@ -146,17 +156,35 @@ public class MainActivity extends BaseActivity
         return Observable.create(subscriber -> {
             try {
                 FileChooser chooserFragment = new FileChooser.Builder(FileChooser.ChooserType.FILE_CHOOSER, path -> {
-                    replaceFragment(R.id.main_container, new ListFragment(mListener));
+                    mFragmentManager.beginTransaction().remove(mBottomSheet).commit();
+                    replaceFragment(R.id.main_container, ListFragment.newInstance(mListener));
                     subscriber.onNext(path);
                     subscriber.onCompleted();
                     mFab.setVisibility(View.VISIBLE);
-                }).setFileFormats(formats).build();
+                }).setFileFormats(formats).setFileIcon(getFileIcon(formats[0])).build();
                 replaceWithAnimFragment(R.id.main_container, chooserFragment);
                 mFragmentManager.beginTransaction().remove(mBottomSheet).commit();
                 mFab.setVisibility(View.INVISIBLE);
             } catch (ExternalStorageNotAvailableException exc) {
                 subscriber.onError(exc);
             }
+        });
+    }
+
+    private int getFileIcon(String format) {
+        if (format.equals(".pdf")) {
+            return R.drawable.ic_pdf_file;
+        } else if (format.equals(".txt")) {
+            return R.drawable.ic_txt_file;
+        } else {
+            return R.drawable.ic_doc_x_file;
+        }
+    }
+
+    private Observable<String> enterLink() {
+        return Observable.create(subscriber ->  {
+            mFragmentManager.beginTransaction().remove(mBottomSheet).commit();
+            LinkDialogFragment.newInstance(subscriber).show(mFragmentManager, "LinkDialogFragment");
         });
     }
 }

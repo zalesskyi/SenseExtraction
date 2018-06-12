@@ -8,6 +8,8 @@ import com.zalesskyi.android.diploma.realm.RealmService;
 import com.zalesskyi.android.diploma.utils.NetworkCheck;
 import com.zalesskyi.android.diploma.view.BaseView;
 
+import java.io.File;
+
 public abstract class BasePresenter<V extends BaseView> {
 
     protected Application mApplication;
@@ -38,7 +40,12 @@ public abstract class BasePresenter<V extends BaseView> {
      * @return путь к директории с рефератами.
      */
     protected String getPathToAbstracts() {
-        return Environment.getExternalStorageDirectory().getAbsolutePath() + "/SenseExtraction/";
+        String pathToAbstracts = Environment.getExternalStorageDirectory().getAbsolutePath() + "/SenseExtraction/";
+        File dir = new File(pathToAbstracts);
+        if (!dir.exists()) {
+            dir.mkdir();
+        }
+        return pathToAbstracts;
     }
 
     public void init(V v) {

@@ -41,24 +41,27 @@ public interface MainListener {
      * Метод открывает DetailActivity.
      *
      * @param path путь к файлу.
+     * @param isForUploading предназначение открытия файла (для загрузки реферата?)
      */
-    void openTxtFile(String path);
+    void openTxtFile(String path, boolean isForUploading);
 
     /**
      * Открыть pdf-файл.
      * Метод открывает DetailActivity.
      *
      * @param path путь к файлу.
+     * @param isForUploading предназначение открытия файла (для загрузки реферата?)
      */
-    void openPdfFile(String path);
+    void openPdfFile(String path, boolean isForUploading);
 
     /**
      * Открыть doc-файл.
      * Метод открывает DetailActivity.
      *
      * @param path путь к файлу.
+     * @param isForUploading предназначение открытия файла (для загрузки реферата?)
      */
-    void openDocFile(String path);
+    void openDocFile(String path, boolean isForUploading);
 
     //todo String openDriveFile(String );
 
@@ -67,6 +70,14 @@ public interface MainListener {
      * Метод открывает DetailActivity.
      *
      * @param url URL web-страницы.
+     * @param isForUploading предназначение открытия файла (для загрузки реферата?)
      */
-    void openWebPage(String url);
+    void openWebPage(String url, boolean isForUploading);
+
+    /**
+     * Открыть экран с текстом из буфера обмена.
+     *
+     * @param isForUploading предназначение открытия файла (для загрузки реферата?)
+     */
+    void openClipboardText(boolean isForUploading);
 }

@@ -1,6 +1,6 @@
 package com.zalesskyi.android.diploma.interactor;
 
-import com.google.gson.JsonObject;
+import com.zalesskyi.android.diploma.model.Response;
 
 import rx.Observable;
 
@@ -13,5 +13,5 @@ public interface InteractorContract {
      * @param coefficient коэффициент реферирования.
      * @return поток данных с сервера (реферат)
      */
-    Observable<JsonObject> toDoGetAbstract(String source, Integer coefficient);
+    Observable<Response> toDoGetAbstract(String source, Integer coefficient);
 }

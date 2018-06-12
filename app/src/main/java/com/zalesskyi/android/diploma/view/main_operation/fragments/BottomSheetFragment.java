@@ -1,6 +1,5 @@
 package com.zalesskyi.android.diploma.view.main_operation.fragments;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.design.widget.BottomSheetDialogFragment;
 import android.util.Log;
@@ -34,39 +33,50 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
     @BindView(R.id.bs_drive)
     View mDriveView;
 
+    @BindView(R.id.bs_clipboard)
+    View mClipboardView;
+
     private View.OnClickListener mClickListener = v -> {
         if (v.equals(mLinkView)) {
-            // todo link
+            mListener.getLink()
+                    .subscribe(url -> {
+                        Log.i(TAG, url);
+                        mListener.openWebPage(url, true);
+                    });
         } else if (v.equals(mTxtView)) {
             mListener.getTxtFile()
                     .subscribe(path -> {
                        Log.i(TAG, path);
+                       mListener.openTxtFile(path, true);
                     });
         } else if (v.equals(mPdfView)) {
             mListener.getPdfFile()
                     .subscribe(path -> {
                         Log.i(TAG, path);
-                        mListener.openPdfFile(path);
+                        mListener.openPdfFile(path, true);
                     });
         } else if (v.equals(mDocView)) {
             mListener.getDocFile()
                     .subscribe(path -> {
                         Log.i(TAG, path);
-                        mListener.openDocFile(path);
+                        mListener.openDocFile(path, true);
                     });
         } else if (v.equals(mDriveView)) {
             // todo drive
+        } else if (v.equals(mClipboardView)) {
+            mListener.openClipboardText(true);
         }
     };
+
+    public static BottomSheetFragment newInstance(MainListener listener) {
+        BottomSheetFragment fragment = new BottomSheetFragment();
+        fragment.mListener = listener;
+        return fragment;
+    }
 
 
     public BottomSheetFragment() {
         // required
-    }
-
-    @SuppressLint("ValidFragment")
-    public BottomSheetFragment(MainListener listener) {
-        mListener = listener;
     }
 
     @Override
@@ -84,5 +94,6 @@ public class BottomSheetFragment extends BottomSheetDialogFragment {
         mPdfView.setOnClickListener(mClickListener);
         mDocView.setOnClickListener(mClickListener);
         mDriveView.setOnClickListener(mClickListener);
+        mClipboardView.setOnClickListener(mClickListener);
     }
 }

@@ -3,8 +3,6 @@ package com.zalesskyi.android.diploma.presenter;
 
 import android.graphics.Bitmap;
 
-import com.aspose.words.Document;
-
 import rx.Observable;
 
 public interface PresenterContract {
@@ -77,11 +75,6 @@ public interface PresenterContract {
         void doGetAbstractFromUrl(String sourceTextUrl);
 
         /**
-         * Получение реферата текста из буфера обмена.
-         */
-        void doGetAbstractFromClipboard();
-
-        /**
          * @param path путь к doc-файлу.
          * @param pageNum номер страницы, которую надо отобразить.
          *
@@ -89,6 +82,30 @@ public interface PresenterContract {
          */
         Observable<Bitmap> doGetDocPageImage(String path, int pageNum);
 
-        int doGetWordDocumentPageCount(String pathToDoc);
+        Observable<Integer> doGetWordDocumentPageCount(String pathToDoc);
+
+        /**
+         * Создание txt-файла реферата.
+         *
+         * @param pathToSource путь к исходному файлу.
+         * @param abstractText содержимое реферата.
+         */
+        void doCreateTxtFileWithAbstract(String pathToSource, String abstractText);
+
+        /**
+         * Создание pdf-файла реферата.
+         *
+         * @param pathToSource путь к исходному файлу.
+         * @param abstractText содержимое реферата.
+         */
+        void doCreatePdfFileWithAbstract(String pathToSource, String abstractText);
+
+        /**
+         * Создание doc-файла реферата.
+         *
+         * @param pathToSource путь к исходному файлу.
+         * @param abstractText содержимое реферата.
+         */
+        void doCreateDocFileWithAbstract(String pathToSource, String abstractText);
     }
 }

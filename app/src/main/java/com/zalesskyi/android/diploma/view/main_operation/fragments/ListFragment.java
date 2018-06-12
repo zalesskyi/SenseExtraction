@@ -25,18 +25,15 @@ public class ListFragment extends Fragment {
     @BindView(R.id.main_list)
     RecyclerView mRecyclerView;
 
-    public static ListFragment newInstance() {
-        return new ListFragment();
+    public static ListFragment newInstance(MainListener listener) {
+        ListFragment fragment = new ListFragment();
+        fragment.setListener(listener);
+        return fragment;
     }
 
 
     public ListFragment() {
         // Required empty public constructor
-    }
-
-    @SuppressLint("ValidFragment")
-    public ListFragment(MainListener listener) {
-        mListener = listener;
     }
 
     @Override
@@ -46,6 +43,10 @@ public class ListFragment extends Fragment {
         ButterKnife.bind(this, v);
         setupUI();
         return v;
+    }
+
+    public void setListener(MainListener listener) {
+        mListener = listener;
     }
 
     private void setupUI() {

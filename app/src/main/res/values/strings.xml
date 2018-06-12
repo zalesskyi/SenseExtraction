@@ -10,4 +10,7 @@
     <string name="bs_drive">Google Drive</string>
     <string name="bs_title">New abstract of</string>
     <string name="bs_clipboard">Clipboard</string>
+    <string name="dialog_link_hint">Put URL here…</string>
+    <string name="dialog_link_title">Enter URL to the page</string>
+    <string name="detail_upload_snackbar">Get abstract from this text?</string>
 </resources>
