@@ -14,11 +14,11 @@ public interface RealmService {
 
     <T extends RealmObject> Observable<RealmResults<T>> getObjects(Class<T> clazz);
 
-    <T extends RealmObject> Observable<Class<T>> deleteObject(long id, Class<T> clazz);
+    <T extends RealmObject> Observable<Class<T>> deleteObject(String id, Class<T> clazz);
 
     <T extends RealmObject> Observable<Class<T>> deleteAllObjects(Class<T> clazz);
 
-    <T extends RealmObject> Observable<T> getObject(long id, Class<T> clazz);
+    <T extends RealmObject> Observable<T> getObject(String id, Class<T> clazz);
 }
 
 

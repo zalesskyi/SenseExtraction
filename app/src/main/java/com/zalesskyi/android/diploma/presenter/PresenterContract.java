@@ -3,6 +3,9 @@ package com.zalesskyi.android.diploma.presenter;
 
 import android.graphics.Bitmap;
 
+import com.zalesskyi.android.diploma.realm.Abstract;
+import com.zalesskyi.android.diploma.view.main_operation.listeners.MainListener;
+
 import rx.Observable;
 
 public interface PresenterContract {
@@ -10,36 +13,19 @@ public interface PresenterContract {
     interface MainPresenter {
 
         /**
-         * Поделиться результатом реферирования.
+         * Получение списка рефератов из локальной БД.
          *
-         * @param id id реферата
+         * @param callback callback отображения списка.
          */
-        void shareAbstract(long id);
+        void doGetListFromRealm(MainListener.ListCallback callback);
 
         /**
-         * Отметить результат реферирования, как favorite.
+         * Удаление элемента из списка.
          *
-         * @param id id реферата
+         * @param item элемент списка
          */
-        void starAbstract(long id);
-
-        /**
-         * Открыть файл с результатом реферирования с помощью одного из приложений,
-         * установленных на устройстве.
-         *
-         * @param id id реферата
-         */
-        void openWithAbstract(long id);
-
-        /**
-         * Удалить реферат с устройства.
-         *
-         * @param id id реферата.
-         */
-        void removeAbstract(long id);
+        void doRemoveItemFromList(Abstract item);
     }
-
-
     //----------------------------------------------------------------------------------------------
     interface DetailPresenter {
         /**
@@ -86,26 +72,9 @@ public interface PresenterContract {
 
         /**
          * Создание txt-файла реферата.
-         *
-         * @param pathToSource путь к исходному файлу.
+         *  @param pathToSource путь к исходному файлу.
          * @param abstractText содержимое реферата.
          */
-        void doCreateTxtFileWithAbstract(String pathToSource, String abstractText);
-
-        /**
-         * Создание pdf-файла реферата.
-         *
-         * @param pathToSource путь к исходному файлу.
-         * @param abstractText содержимое реферата.
-         */
-        void doCreatePdfFileWithAbstract(String pathToSource, String abstractText);
-
-        /**
-         * Создание doc-файла реферата.
-         *
-         * @param pathToSource путь к исходному файлу.
-         * @param abstractText содержимое реферата.
-         */
-        void doCreateDocFileWithAbstract(String pathToSource, String abstractText);
+        String doCreateTxtFileWithAbstract(String pathToSource, String abstractText);
     }
 }

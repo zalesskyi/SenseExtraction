@@ -13,4 +13,6 @@
     <string name="dialog_link_hint">Put URL here…</string>
     <string name="dialog_link_title">Enter URL to the page</string>
     <string name="detail_upload_snackbar">Get abstract from this text?</string>
+
+    <string name="menu_three_vertical_points">&#8942;</string>
 </resources>

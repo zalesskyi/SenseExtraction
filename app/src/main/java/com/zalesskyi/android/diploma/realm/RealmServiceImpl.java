@@ -51,7 +51,7 @@ public class RealmServiceImpl implements RealmService {
     }
 
     @Override
-    public <T extends RealmObject> Observable<Class<T>> deleteObject(long id, Class<T> clazz) {
+    public <T extends RealmObject> Observable<Class<T>> deleteObject(String id, Class<T> clazz) {
         return Observable.just(clazz)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -75,7 +75,7 @@ public class RealmServiceImpl implements RealmService {
     }
 
     @Override
-    public <T extends RealmObject> Observable<T> getObject(long id, Class<T> clazz) {
+    public <T extends RealmObject> Observable<T> getObject(String id, Class<T> clazz) {
         return Observable.just(clazz)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())

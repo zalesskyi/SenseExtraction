@@ -21,6 +21,7 @@ import com.github.barteksc.pdfviewer.PDFView;
 import com.zalesskyi.android.diploma.R;
 import com.zalesskyi.android.diploma.app.App;
 import com.zalesskyi.android.diploma.presenter.DetailPresenterImpl;
+import com.zalesskyi.android.diploma.realm.Abstract;
 import com.zalesskyi.android.diploma.view.BaseActivity;
 import com.zalesskyi.android.diploma.view.BaseView;
 import com.zalesskyi.android.diploma.view.detail_operation.fragments.PageFragment;
@@ -47,12 +48,6 @@ public class DetailActivity extends BaseActivity implements BaseView.DetailView 
     private static final String DETAIL_TYPE_EXTRA = "detail_type";
     private static final String PATH_EXTRA = "path";
     private static final String IS_UPLOADING_EXTRA = "is_uploading";
-
-    public static final int DETAIL_TYPE_WEB_PAGE = 0;
-    public static final int DETAIL_TYPE_TXT_FILE = 1;
-    public static final int DETAIL_TYPE_DOC_FILE = 2;
-    public static final int DETAIL_TYPE_PDF_FILE = 3;
-    public static final int DETAIL_TYPE_CLIPBOARD_TEXT = 4;
 
     private int mDetailType;
     private String mPath;
@@ -117,6 +112,22 @@ public class DetailActivity extends BaseActivity implements BaseView.DetailView 
 
         setupUI();
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        mPresenter.dismiss();
+    }
+
+    @Override
+    public void displayAbstractFile(String pathToAbstract) {
+        Intent i = newIntent(this, Abstract.TXT_TYPE, pathToAbstract, false);
+        startActivity(i);
+        finish();
+    }
+
+
     @Override
     public void showError(String err) {
 
@@ -134,7 +145,7 @@ public class DetailActivity extends BaseActivity implements BaseView.DetailView 
 
     @SuppressLint("SetJavaScriptEnabled")
     private void setupUI() {
-        if (mDetailType == DETAIL_TYPE_WEB_PAGE) {
+        if (mDetailType == Abstract.WEB_TYPE) {
             mPdfView.setVisibility(View.GONE);
             mWebView.setVisibility(View.VISIBLE);
             mDocPager.setVisibility(View.GONE);
@@ -148,7 +159,7 @@ public class DetailActivity extends BaseActivity implements BaseView.DetailView 
                 }
             });
             mWebView.loadUrl(mPath);
-        } else if (mDetailType == DETAIL_TYPE_DOC_FILE) {
+        } else if (mDetailType == Abstract.DOC_TYPE) {
             mPdfView.setVisibility(View.GONE);
             mWebView.setVisibility(View.GONE);
             mDocPager.setVisibility(View.VISIBLE);
@@ -176,7 +187,7 @@ public class DetailActivity extends BaseActivity implements BaseView.DetailView 
                                 }
                     },
                             err -> showError(err.getMessage()), () -> hideProgress());
-        } else if (mDetailType == DETAIL_TYPE_PDF_FILE) {
+        } else if (mDetailType == Abstract.PDF_TYPE) {
             mPdfView.setVisibility(View.VISIBLE);
             mWebView.setVisibility(View.GONE);
             mDocPager.setVisibility(View.GONE);
@@ -189,15 +200,14 @@ public class DetailActivity extends BaseActivity implements BaseView.DetailView 
                         Log.e(TAG, err.getMessage());
                     })
                     .load();
-        } else if (mDetailType == DETAIL_TYPE_TXT_FILE) {
-            mTxtView.setVisibility(View.VISIBLE);
+        } else if (mDetailType == Abstract.TXT_TYPE) {
             mPdfView.setVisibility(View.GONE);
             mWebView.setVisibility(View.GONE);
             mDocPager.setVisibility(View.GONE);
 
             mTxtView.setMovementMethod(new ScrollingMovementMethod());
             displayTxtFile();
-        } else if (mDetailType == DETAIL_TYPE_CLIPBOARD_TEXT) {
+        } else if (mDetailType == Abstract.CLIPBOARD_TYPE) {
             mTxtView.setVisibility(View.VISIBLE);
             mPdfView.setVisibility(View.GONE);
             mWebView.setVisibility(View.GONE);
@@ -210,15 +220,15 @@ public class DetailActivity extends BaseActivity implements BaseView.DetailView 
         if (mIsUploading) {
             Snackbar.make(mCoordinator, R.string.detail_upload_snackbar, Snackbar.LENGTH_INDEFINITE)
                     .setAction(android.R.string.yes, view -> {
-                        if (mDetailType == DETAIL_TYPE_CLIPBOARD_TEXT) {
+                        if (mDetailType == Abstract.CLIPBOARD_TYPE) {
                             mPresenter.doGetAbstractFromString(mPresenter.getTextFromClipboard().toString());
-                        } else if (mDetailType == DETAIL_TYPE_TXT_FILE) {
+                        } else if (mDetailType == Abstract.TXT_TYPE) {
                             mPresenter.doGetAbstractFromTxt(mPath);
-                        } else if (mDetailType == DETAIL_TYPE_PDF_FILE) {
+                        } else if (mDetailType == Abstract.PDF_TYPE) {
                             mPresenter.doGetAbstractFromPdf(mPath);
-                        } else if (mDetailType == DETAIL_TYPE_DOC_FILE) {
+                        } else if (mDetailType == Abstract.DOC_TYPE) {
                             mPresenter.doGetAbstractFromDoc(mPath);
-                        } else if (mDetailType == DETAIL_TYPE_WEB_PAGE) {
+                        } else if (mDetailType == Abstract.WEB_TYPE) {
                             mPresenter.doGetAbstractFromUrl(mPath);
                         }
                     }).show();

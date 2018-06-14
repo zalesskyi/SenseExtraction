@@ -12,6 +12,6 @@ public interface BaseView {
     }
 
     interface DetailView extends BaseView {
-
+        void displayAbstractFile(String pathToAbstract);
     }
 }

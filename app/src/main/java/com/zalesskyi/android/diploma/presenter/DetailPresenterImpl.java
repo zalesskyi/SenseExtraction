@@ -8,20 +8,15 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.aspose.words.Document;
-import com.aspose.words.DocumentBuilder;
 import com.aspose.words.ImageSaveOptions;
 import com.aspose.words.SaveFormat;
-import com.itextpdf.text.Chunk;
-import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Font;
-import com.itextpdf.text.Paragraph;
-import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfReader;
-import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.pdf.parser.PdfTextExtractor;
 import com.zalesskyi.android.diploma.interactor.Interactor;
+import com.zalesskyi.android.diploma.realm.Abstract;
 import com.zalesskyi.android.diploma.realm.RealmService;
 import com.zalesskyi.android.diploma.utils.NetworkCheck;
+import com.zalesskyi.android.diploma.view.detail_operation.activities.DetailActivity;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -31,7 +26,6 @@ import org.jsoup.select.Elements;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
@@ -76,8 +70,9 @@ public class DetailPresenterImpl extends BasePresenter
                     .doOnRequest(l -> mView.showProgress())
                     .subscribe(response -> {
                         String abstractText = response.getAbstract();
-                        doCreateTxtFileWithAbstract(pathToSourceTxt, abstractText);
-                        // todo
+                        String abstractFileName = doCreateTxtFileWithAbstract(pathToSourceTxt, abstractText);
+                        putAbstractIntoRealm(abstractFileName, pathToSourceTxt, Abstract.TXT_TYPE);
+                        ((DetailActivity) mView).displayAbstractFile(abstractFileName);
                     }, err -> {
                         mView.showError(err.getMessage());
                     }, () -> {
@@ -99,8 +94,9 @@ public class DetailPresenterImpl extends BasePresenter
                     .doOnRequest(l -> mView.showProgress())
                     .subscribe(response -> {
                         String abstractText = response.getAbstract();
-                        doCreatePdfFileWithAbstract(pathToSourcePdf, abstractText);
-                        // todo
+                        String abstractPath = doCreateTxtFileWithAbstract(pathToSourcePdf, abstractText);
+                        putAbstractIntoRealm(abstractPath, pathToSourcePdf, Abstract.PDF_TYPE);
+                        ((DetailActivity) mView).displayAbstractFile(abstractPath);
                     }, err -> {
                         mView.showError(err.getMessage());
                     }, () -> {
@@ -118,7 +114,9 @@ public class DetailPresenterImpl extends BasePresenter
                     .doOnRequest(l -> mView.showProgress())
                     .subscribe(response -> {
                         String abstractText = response.getAbstract();
-                        doCreateDocFileWithAbstract(pathToSourceDoc, abstractText);
+                        String abstractPath = doCreateTxtFileWithAbstract(pathToSourceDoc, abstractText);
+                        putAbstractIntoRealm(abstractPath, pathToSourceDoc, Abstract.DOC_TYPE);
+                        ((DetailActivity) mView).displayAbstractFile(abstractPath);
                     }, err -> {
                         mView.showError(err.getMessage());
                     }, () -> {
@@ -135,7 +133,9 @@ public class DetailPresenterImpl extends BasePresenter
                 .doOnRequest(l -> mView.showProgress())
                 .subscribe(response -> {
                     String abstractText = response.getAbstract();
-                    doCreateTxtFileWithAbstract(null, abstractText);
+                    String abstractPath = doCreateTxtFileWithAbstract(null, abstractText);
+                    putAbstractIntoRealm(abstractPath, null, Abstract.CLIPBOARD_TYPE);
+                    ((DetailActivity) mView).displayAbstractFile(abstractPath);
                 }, err -> {
                     mView.showError(err.getMessage());
                 }, () -> {
@@ -153,7 +153,9 @@ public class DetailPresenterImpl extends BasePresenter
                             .doOnRequest(l -> mView.showProgress())      // исходный текст web-страницы на сервер.
                             .subscribe(response -> {
                                 String abstractText = response.getAbstract();
-                                doCreateTxtFileWithAbstract(null, abstractText);
+                                String abstractPath = doCreateTxtFileWithAbstract(null, abstractText);
+                                putAbstractIntoRealm(abstractPath, sourceTextUrl, Abstract.WEB_TYPE);
+                                ((DetailActivity) mView).displayAbstractFile(abstractPath);
                             }, err -> mView.showError(err.getMessage()),
                                     () -> mView.hideProgress());
                 });
@@ -183,75 +185,19 @@ public class DetailPresenterImpl extends BasePresenter
         });
     }
 
+    @Nullable
     @Override
-    public void doCreateTxtFileWithAbstract(@Nullable String pathToSource, String abstractText) {
-        String abstractFileName;
-        if (pathToSource != null) {
-            File source = new File(pathToSource);
-            int endIndex = source.getName().lastIndexOf(".");
-            String sourceName = source.getName().substring(0, endIndex);
-            abstractFileName = getPathToAbstracts()
-                    + sourceName + "_abstract.txt";
-        } else {
-            abstractFileName = getPathToAbstracts()
-                    + UUID.randomUUID().toString() + "_abstract.txt";
-        }
+    public String doCreateTxtFileWithAbstract(@Nullable String pathToSource, String abstractText) {
         try {
-            File abstractFile = new File(abstractFileName);
-            abstractFile.createNewFile();
+            String abstractFileName = getPathToAbstract(pathToSource);
             OutputStreamWriter writer = new OutputStreamWriter(
-                    new FileOutputStream(abstractFile), StandardCharsets.UTF_8);
+                    new FileOutputStream(abstractFileName), StandardCharsets.UTF_8);
             writer.write(abstractText);
             writer.close();
+            return abstractFileName;
         } catch (IOException exc) {
             mView.showError(exc.getMessage());
-        }
-    }
-
-    // todo encoding
-    @Override
-    public void doCreatePdfFileWithAbstract(String pathToSource, String abstractText) {
-        com.itextpdf.text.Document doc = null;
-        try {
-            File source = new File(pathToSource);
-            String abstractFileName = getPathToAbstracts() + source.getName()
-                    .substring(0, source.getName().lastIndexOf(".")) + "_abstract.pdf";
-            File pdf = new File(abstractFileName);
-            pdf.createNewFile();
-
-            doc = new com.itextpdf.text.Document();
-            PdfWriter.getInstance(doc, new FileOutputStream(pdf));
-            BaseFont helvetica = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
-            Font font = new Font(helvetica, 12, Font.NORMAL);
-            Chunk chunk = new Chunk("",font);
-            doc.add(chunk);
-            doc.open();
-            String[] parags = abstractText.split("\t");
-            for (String parag : parags) {
-                doc.add(new Paragraph(parag));
-            }
-        } catch (IOException | DocumentException exc) {
-            mView.showError(exc.getMessage());
-        }
-        if (doc != null) {
-            doc.close();
-        }
-    }
-
-    @Override
-    public void doCreateDocFileWithAbstract(String pathToSource, String abstractText) {
-        try {
-            File source = new File(pathToSource);
-            String abstractFileName = getPathToAbstracts() + source.getName()
-                    .substring(0, source.getName().lastIndexOf(".")) + "_abstract.docx";
-            File abstractFile = new File(abstractFileName);
-            abstractFile.createNewFile();
-            Document doc = new Document();
-            DocumentBuilder builder = new DocumentBuilder(doc);
-            builder.write(abstractText);
-            doc.save(abstractFileName);
-        } catch (Exception exc) {
-            mView.showError(exc.getMessage());
+            return null;
         }
     }
 
@@ -261,6 +207,33 @@ public class DetailPresenterImpl extends BasePresenter
     public CharSequence getTextFromClipboard() {
         ClipboardManager clipboard = (ClipboardManager) mApplication.getSystemService(CLIPBOARD_SERVICE);
         return clipboard.getPrimaryClip().getItemAt(0).getText();
+    }
+
+    /**
+     * Вставка записи в БД.
+     *
+     * @param pathToAbstract путь к файлу с рефератом.
+     * @param pathToSource путь к исходному файлу (с случае с URL - URL)
+     * @param typeOfSource тип исходного файла
+     */
+    private void putAbstractIntoRealm(String pathToAbstract, String pathToSource, int typeOfSource) {
+        Abstract newAbstract = new Abstract.Builder()
+                .setPathToSource(pathToSource == null ? "" : pathToSource)
+                .setPathToAbstract(pathToAbstract)
+                .setPathToSourceThumb(typeOfSource == Abstract.DOC_TYPE
+                        || typeOfSource == Abstract.PDF_TYPE ?
+                        getPathToThumbnails() + getFileNameWithoutExtension(pathToSource) + ".jpeg" : "")
+                .setPathToImagesIfDoc(typeOfSource == Abstract.DOC_TYPE ?
+                        getPathToDocPageImages() + getFileNameWithoutExtension(pathToSource) : "")
+                .setCreationDate(new Date().getTime())
+                .setIsFavorite(false)
+                .setSyncedWithCloud(false)
+                .setType(typeOfSource)
+                .build();
+        mRealmService.addObject(newAbstract, Abstract.class)
+                .subscribe(abs -> {
+                        Log.i(TAG, "abstract " + abs.toString() + "was added into realm");
+                    }, err -> Log.e(TAG, err.getMessage()));
     }
 
     /**
@@ -347,7 +320,7 @@ public class DetailPresenterImpl extends BasePresenter
         Document doc = new Document(pathToDoc);
         BitmapFactory.Options opts = new BitmapFactory.Options();
         opts.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        String picFileName = doc.getOriginalFileName();
+        String picFileName = getFileNameWithoutExtension(pathToDoc);
         picFileName = picFileName.replaceAll("/", "_");
         String pathToPic = getPathToDocPageImages() + picFileName + "/" + page;
         File file = new File(pathToPic);
@@ -360,5 +333,32 @@ public class DetailPresenterImpl extends BasePresenter
         options.setPageCount(1);
         doc.save(pathToPic, options);
         return BitmapFactory.decodeFile(pathToPic, opts);
+    }
+
+    private String getPathToAbstract(String pathToSource) throws IOException {
+        String abstractFileName;
+        if (pathToSource != null) {
+            String sourceName = getFileNameWithoutExtension(pathToSource);
+            abstractFileName = getPathToAbstracts()
+                    + sourceName + "_abstract.txt";
+        } else {
+            abstractFileName = getPathToAbstracts()
+                    + UUID.randomUUID().toString() + "_abstract.txt";
+        }
+        File file = new File(abstractFileName);
+        file.createNewFile();
+        return abstractFileName;
+    }
+
+    /**
+     * Получение имени файла.
+     *
+     * @param path путь к файлу
+     * @return имя файла без расширения
+     */
+    private String getFileNameWithoutExtension(String path) {
+        File source = new File(path);
+        int endIndex = source.getName().lastIndexOf(".");
+        return source.getName().substring(0, endIndex);
     }
 }

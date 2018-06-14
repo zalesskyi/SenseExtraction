@@ -28,12 +28,12 @@ public abstract class BasePresenter<V extends BaseView> {
     }
 
     /**
-     * @return путь к директории с картинками миниатюр рефератов.
+     * @return путь к директории с картинками миниатюр исходных текстов.
      *         Миниатюра - это изображение первой страницы файла.
      *         Выводится в главном списке ListFragment.
      */
     protected String getPathToThumbnails() {
-        return mApplication.getFilesDir().getAbsolutePath() + "/thumbnails";
+        return mApplication.getFilesDir().getAbsolutePath() + "/thumbnails/";
     }
 
     /**

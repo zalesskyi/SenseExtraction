@@ -15,10 +15,12 @@ import com.zalesskyi.android.diploma.R;
 import com.zalesskyi.android.diploma.app.App;
 import com.zalesskyi.android.diploma.presenter.MainPresenterImpl;
 import com.zalesskyi.android.diploma.presenter.PresenterContract;
+import com.zalesskyi.android.diploma.realm.Abstract;
 import com.zalesskyi.android.diploma.view.BaseActivity;
 import com.zalesskyi.android.diploma.view.BaseView;
 import com.zalesskyi.android.diploma.view.detail_operation.activities.DetailActivity;
 import com.zalesskyi.android.diploma.view.detail_operation.listeners.DetailListener;
+import com.zalesskyi.android.diploma.view.main_operation.adapters.AbstractsAdapter;
 import com.zalesskyi.android.diploma.view.main_operation.fragments.BottomSheetFragment;
 import com.zalesskyi.android.diploma.view.main_operation.fragments.LinkDialogFragment;
 import com.zalesskyi.android.diploma.view.main_operation.fragments.ListFragment;
@@ -74,31 +76,69 @@ public class MainActivity extends BaseActivity
         @Override
         public void openTxtFile(String path, boolean isForUploading) {
             startActivity(DetailActivity.newIntent(
-                    MainActivity.this, DetailActivity.DETAIL_TYPE_TXT_FILE, path, isForUploading));
+                    MainActivity.this, Abstract.TXT_TYPE, path, isForUploading));
         }
 
         @Override
         public void openPdfFile(String path, boolean isForUploading) {
             startActivity(DetailActivity.newIntent(
-                    MainActivity.this, DetailActivity.DETAIL_TYPE_PDF_FILE, path, isForUploading));
+                    MainActivity.this, Abstract.PDF_TYPE, path, isForUploading));
         }
 
         @Override
         public void openDocFile(String path, boolean isForUploading) {
             startActivity(DetailActivity.newIntent(
-                    MainActivity.this, DetailActivity.DETAIL_TYPE_DOC_FILE, path, isForUploading));
+                    MainActivity.this, Abstract.DOC_TYPE, path, isForUploading));
         }
 
         @Override
         public void openWebPage(String url, boolean isForUploading) {
             startActivity(DetailActivity.newIntent(
-                    MainActivity.this, DetailActivity.DETAIL_TYPE_WEB_PAGE, url, isForUploading));
+                    MainActivity.this, Abstract.WEB_TYPE, url, isForUploading));
         }
 
         @Override
         public void openClipboardText(boolean isForUploading) {
             startActivity(DetailActivity.newIntent(MainActivity.this,
-                    DetailActivity.DETAIL_TYPE_CLIPBOARD_TEXT, null, isForUploading));
+                    Abstract.CLIPBOARD_TYPE, null, isForUploading));
+        }
+
+        @Override
+        public void getListOfAbstractsFromRealm(ListCallback callback) {
+            mPresenter.doGetListFromRealm(callback);
+        }
+
+        @Override
+        public void open(Abstract item) {
+            startActivity(DetailActivity.newIntent(MainActivity.this,
+                    item.getType(), item.getPathToAbstract(), false));
+        }
+
+        @Override
+        public void share(Abstract item) {
+            // todo
+        }
+
+        @Override
+        public void star(Abstract item) {
+            new Abstract.Builder(item)
+                    .setIsFavorite(true).build();
+        }
+
+        @Override
+        public void openWith(Abstract item) {
+
+        }
+
+        @Override
+        public void remove(Abstract item) {
+            mPresenter.doRemoveItemFromList(item);
+        }
+
+        @Override
+        public void openSource(Abstract item) {
+            startActivity(DetailActivity.newIntent(
+                    MainActivity.this, item.getType(), item.getPathToSource(), false));
         }
     };
 
